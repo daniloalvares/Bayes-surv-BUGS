@@ -1,0 +1,16 @@
+model {
+
+# Uncensored and right-censored observations
+  for(i in 1:n) {
+    is.censored[i] ~ dinterval(time[i], cen[i])
+    time[i] ~ dweib(alpha, lambda[i])
+    lambda[i] <- exp(-mu[i] * alpha)
+    mu[i] <- inprod(beta[], X[i, ])
+  }
+    
+  # Prior distributions 
+  for(l in 1:Nbetas) {
+    beta[l] ~ dnorm(0, 0.001)
+  }
+  alpha ~ dunif(0, 10)
+}
