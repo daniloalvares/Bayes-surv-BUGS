@@ -1,1 +1,1 @@
-# Bayes-surv-BUGS
+# Bayesian survival analysis with BUGS
