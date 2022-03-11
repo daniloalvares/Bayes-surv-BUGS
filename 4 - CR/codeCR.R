@@ -48,7 +48,7 @@ mcmc_cif <- function(obj, t.pred, x) {
     sapply(t.pred, function(tt) {
       aux <- mclapply(samples.idx, function(i) {
         cif(tt, alpha = unlist(obj[i, a.idx]), lambda = unlist(obj[i, l.idx]),
-            beta = matrix(unlist(c(res[i, b.idx])), nrow = n.b), x = x, k = k)
+            beta = matrix(unlist(c(obj[i, b.idx])), nrow = n.b), x = x, k = k)
       })
       return(mean(unlist(aux)))
     })
@@ -104,9 +104,9 @@ rownames(table) <- c("beta11", "beta21", "lambda1", "alpha1", "beta12", "beta22"
   "lambda2", "alpha2", "beta13", "beta23", "lambda3", "alpha3")
 table
 
-res <- as.data.frame(result)
+res2 <- as.data.frame(result)
 t.pred <- seq(0, 100, by = 2.5)
-cum_inc <- mcmc_cif(res, t.pred, c(1, 1))
+cum_inc <- mcmc_cif(res2, t.pred, c(1, 1))
 
 # install.packages("ggplot2", dep = TRUE)
 library("ggplot2")
