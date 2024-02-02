@@ -20,7 +20,7 @@ larynx$diagyr <- as.numeric(scale(larynx$diagyr))
 larynx$stage <- as.factor(larynx$stage)
 X <- model.matrix(~ -1 + stage + age + diagyr, data = larynx)
 
-# Time axis partitition 
+# Time axis partition 
 K <- 3 # number of intervals  
 a <- seq(0, max(larynx$time) + 0.001, length.out = K + 1)
 
