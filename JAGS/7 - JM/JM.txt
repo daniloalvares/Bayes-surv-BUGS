@@ -1,0 +1,42 @@
+model {
+  for(i in 1:n) {
+      # Longitudinal observations
+      for(j in 1:M[i]) {
+          log.proth[i, j] ~ dnorm(mu[i, j], tau)
+      	  mu[i, j] <- inprod(betaL[], XL[i, j, ]) + inprod(b[i, ], ZL[i, j, ])
+      }
+    
+      # Survival and censoring times
+      # Hazard function at integration points
+      for(j in 1:K) {
+          haz[i, j] <- alpha * pow(Time[i] / 2 * (xk[j] + 1), alpha - 1) * exp( inprod(betaS[], XS[i, ]) +
+            gamma * ( b[i, 1] + b[i, 2] * (Time[i] / 2 * (xk[j] + 1)) ) )
+      }
+      # Log-survival function with Gauss-Legendre quadrature
+      logSurv[i] <- -Time[i] / 2 * inprod(wk, haz[i, ])
+    
+      # Definition of the survival log-likelihood using zeros trick     
+      phi[i] <- 100000 - death[i] * log(haz[i, K]) - logSurv[i]
+      zeros[i] ~ dpois(phi[i])
+    
+      # Random effects
+      b[i,1:Nb] ~ dmnorm(mub[], Omega[, ])
+  }
+  
+  # Prior distributions
+  for(l in 1:NbetasL) {
+    betaL[l] ~ dnorm(0, 0.001)
+  }
+  for(l in 1:NbetasS) {
+    betaS[l] ~ dnorm(0, 0.001)
+  }
+  gamma ~ dnorm(0, 0.001)
+  alpha ~ dgamma(0.01, 0.01)
+  tau ~ dgamma(0.01, 0.01)
+  Omega[1:Nb, 1:Nb] ~ dwish(V[, ], Nb)
+
+  # Derived quantity
+  lambda <- exp(betaS[1])
+  sigma <- sqrt(1/tau)
+  Sigma[1:Nb, 1:Nb] <- inverse(Omega[, ])
+}

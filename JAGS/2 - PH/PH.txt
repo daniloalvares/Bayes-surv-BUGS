@@ -1,0 +1,32 @@
+model {
+  for(i in 1:n) {
+    for(k in 1:int.obs[i]) {
+       cond[i, k] <- step(time[i] - a[k + 1])
+       HH[i, k] <- cond[i, k] * (a[k + 1] - a[k]) * lambda[k] + (1 - cond[i, k]) * (time[i] - a[k]) * lambda[k]
+    }
+    # Cumulative hazard function
+    H[i] <- sum(HH[i, 1:int.obs[i]])
+  }
+  for(i in 1:n) {
+     # Linear predictor 
+     elinpred[i] <- exp(inprod(beta[], X[i, ]))
+     # Log-hazard function
+     logHaz[i] <- log(lambda[int.obs[i]] * elinpred[i])
+     # Log-survival function
+     logSurv[i] <- -H[i] * elinpred[i]
+       
+     # Definition of the log-likelihood using zeros trick
+     phi[i] <- 100000 - delta[i] * logHaz[i] - logSurv[i]
+     zeros[i] ~ dpois(phi[i]) 
+  }
+
+  # Prior distributions 
+  for(l in 1:Nbetas) {
+    beta[l] ~ dnorm(0, 0.001)
+  }
+  for(k in 1:m) {
+    lambda[k] ~ dgamma(0.01, 0.01)
+  }
+} 
+	
+  
